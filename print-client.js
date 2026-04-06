@@ -3,7 +3,7 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const { print } = require("pdf-to-printer");
 
-const APP_BASE_URL = "http://localhost:3000";
+const APP_BASE_URL = "https://ai-tell-you-everything-v1.vercel.app";
 const PRINTER_NAME = "EPSON TM-T88V Receipt5";
 
 function formatDateTime(dateString) {
