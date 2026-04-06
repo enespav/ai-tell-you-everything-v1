@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
   const [fragments, setFragments] = useState("");
@@ -8,6 +8,9 @@ export default function Home() {
   const [tone, setTone] = useState("nüchtern");
   const [version, setVersion] = useState(1);
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const savedSession = localStorage.getItem("sessionId");
@@ -24,12 +27,15 @@ export default function Home() {
   }, []);
 
   const handlePrint = async () => {
+    if (loading) return;
+
     if (fragments.trim().length < 10) {
       alert("Bitte schreibe mindestens zwei Fragmente.");
       return;
     }
 
-    setStatus("Deine Story wird gerade gedruckt…");
+    setLoading(true);
+    setStatus("Wird generiert & gedruckt…");
 
     const sessionId = localStorage.getItem("sessionId");
 
@@ -49,87 +55,109 @@ export default function Home() {
       });
 
       const rawText = await response.text();
-console.log("API raw response:", rawText);
+      console.log("API raw response:", rawText);
 
-let data: any = {};
-try {
-  data = JSON.parse(rawText);
-} catch {
-  throw new Error(`API gab kein JSON zurück: ${rawText.slice(0, 200)}`);
-}
+      let data: any = {};
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        throw new Error(`API gab kein JSON zurück: ${rawText.slice(0, 200)}`);
+      }
 
-if (!response.ok) {
-  throw new Error(data.error || "Fehler beim Erstellen des Druckjobs.");
-}
+      if (!response.ok) {
+        throw new Error(data.error || "Fehler beim Erstellen des Druckjobs.");
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       const newVersion = version + 1;
       setVersion(newVersion);
       localStorage.setItem("version", newVersion.toString());
 
-      setStatus(`Gedruckt · Version ${String(version).padStart(2, "0")}`);
+      setStatus(`Gedruckt ✓ · Version ${String(version).padStart(2, "0")}`);
+      textareaRef.current?.focus();
     } catch (error) {
       console.error(error);
       setStatus("Drucken nicht möglich. Bitte nochmal versuchen.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen p-6 flex flex-col gap-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold">Was bewegt dich?</h1>
+    <main className="min-h-screen bg-[var(--bg)] text-white px-5 py-6 md:px-8 md:py-10">
+      <div className="mx-auto flex min-h-screen max-w-xl flex-col gap-6">
+        <header className="flex flex-col gap-3">
 
-      <p className="text-sm text-gray-600">
-        Schreibe Fragmente aus deinem Alltag oder deiner Umgebung. Daraus wird
-        direkt eine kurze Geschichte gedruckt.
-      </p>
+          <h1 className="max-w-[10ch] text-4xl font-black leading-[0.95] text-[var(--accent)] md:text-6xl">
+            AI tell you everything
+          </h1>
 
-      <div>
-        <label className="block mb-2 font-medium">Deine Fragmente</label>
-        <textarea
-          className="w-full h-40 border p-3 rounded"
-          placeholder={`am kiosk war noch licht\njemand telefonierte laut\nstraßenbahn kam zu früh`}
-          value={fragments}
-          onChange={(e) => setFragments(e.target.value)}
-        />
+        </header>
+
+        <section className="flex flex-col gap-5">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-[var(--accent)]">
+              Deine Fragmente
+            </label>
+            <textarea
+              ref={textareaRef}
+              className="h-44 w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-white/40 focus:outline-none md:h-52"
+              placeholder={`am kiosk war noch licht\njemand telefonierte laut\nstraßenbahn kam zu früh`}
+              value={fragments}
+              onChange={(e) => setFragments(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-[var(--accent)]">
+              Wo spielt das?
+            </label>
+            <input
+              className="w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-white/40 focus:outline-none"
+              placeholder="z. B. Gallus, Bus 16, Kiosk"
+              value={place}
+              onChange={(e) => setPlace(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-[var(--accent)]">
+              Stimmung
+            </label>
+            <select
+              className="w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white focus:outline-none"
+              value={tone}
+              onChange={(e) => setTone(e.target.value)}
+            >
+              <option className="text-black">nüchtern</option>
+              <option className="text-black">warm</option>
+              <option className="text-black">hoffnungsvoll</option>
+              <option className="text-black">seltsam</option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            onClick={handlePrint}
+            disabled={loading}
+            className="w-full bg-[var(--accent)] py-4 text-lg font-semibold text-black transition-opacity disabled:cursor-not-allowed disabled:opacity-50 md:py-5 md:text-xl"
+          >
+            {loading ? "Bitte warten…" : "Story drucken"}
+          </button>
+
+          {status && (
+            <div className="bg-[var(--accent)] p-3 text-center text-sm text-black">
+              {status}
+            </div>
+          )}
+
+          <p className="text-xs leading-relaxed text-white/65">
+            Deine Fragmente bleiben erhalten. Du kannst sie verändern und erneut
+            drucken.
+          </p>
+        </section>
       </div>
-
-      <div>
-        <label className="block mb-2 font-medium">Wo spielt das?</label>
-        <input
-          className="w-full border p-2 rounded"
-          placeholder="z. B. Gallus, Bus 16, Kiosk"
-          value={place}
-          onChange={(e) => setPlace(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block mb-2 font-medium">Stimmung</label>
-        <select
-          className="w-full border p-2 rounded"
-          value={tone}
-          onChange={(e) => setTone(e.target.value)}
-        >
-          <option>nüchtern</option>
-          <option>warm</option>
-          <option>hoffnungsvoll</option>
-          <option>seltsam</option>
-        </select>
-      </div>
-
-      <button
-        type="button"
-        onClick={handlePrint}
-        className="bg-black text-white py-4 rounded text-lg w-full"
-      >
-        Story drucken
-      </button>
-
-      <p className="text-sm text-gray-600">{status}</p>
-
-      <p className="text-xs text-gray-400">
-        Deine Fragmente bleiben erhalten. Du kannst sie verändern und erneut
-        drucken.
-      </p>
     </main>
   );
 }
