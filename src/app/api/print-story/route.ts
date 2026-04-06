@@ -1,13 +1,71 @@
 import { NextResponse } from "next/server";
+import Together from "together-ai";
 import { supabaseServer } from "@/lib/supabase-server";
+
+const together = new Together({
+  apiKey: process.env.TOGETHER_API_KEY,
+});
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { sessionId, version, fragments, place, tone } = body;
 
-    const dummyStory =
-      "Ich stand vor dem Kiosk, als wäre der Morgen schon weiter als ich. Jemand sprach zu laut in ein Telefon, und die Straßenbahn hielt nur kurz. Das Licht blieb an mir hängen.";
+    if (!fragments || fragments.trim().length < 10) {
+      return NextResponse.json(
+        { error: "Bitte schreibe mindestens zwei Fragmente." },
+        { status: 400 }
+      );
+    }
+
+    const systemPrompt = `Du bist ein Autor für Micro-Fiction.
+
+Deine Aufgabe ist es, aus dem Input des Nutzers sofort eine originelle Micro-Story zu schreiben. Nutze Motive, Stimmung, Bilder, Konflikte oder Ideen aus dem Input als Grundlage und forme daraus eine kurze literarische Szene.
+
+Wichtige Perspektivregel:
+Die Geschichte wird immer aus der Ich-Perspektive geschrieben, so als würde der Nutzer die Szene selbst erleben.
+
+Regeln:
+- Maximal 50 Wörter
+- Immer nur eine Story
+- Ich-Perspektive (erste Person: ich, mir, mein)
+- Keine Überschrift
+- Keine Erklärung
+- Keine Analyse
+- Nur der fertige Text
+- Schreibe den Text als zusammenhängenden Fließtext
+
+Der Input soll kreativ verarbeitet werden und als Ausgangspunkt für die Szene dienen.
+Auch ein einzelnes Wort kann zu einer vollständigen Micro-Story werden.`;
+
+    const userPrompt = `Fragmente:
+${fragments}
+
+Ort:
+${place || "nicht angegeben"}
+
+Stimmung:
+${tone || "nüchtern"}`;
+
+    const response = await together.chat.completions.create({
+      model: "Qwen/Qwen3.5-397B-A17B",
+      reasoning: { enabled: false },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 1,
+      max_tokens: 180,
+    });
+
+    const story = response.choices?.[0]?.message?.content?.trim();
+
+    if (!story) {
+      return NextResponse.json(
+        { error: "Keine Story von Together erhalten." },
+        { status: 500 }
+      );
+    }
 
     const { data, error } = await supabaseServer
       .from("print_jobs")
@@ -18,7 +76,7 @@ export async function POST(request: Request) {
           fragments,
           place,
           tone,
-          story: dummyStory,
+          story,
           status: "queued",
         },
       ])
@@ -27,12 +85,21 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Supabase insert error:", error);
-      return NextResponse.json({ error: "Insert failed" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Druckjob konnte nicht gespeichert werden." },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ ok: true, job: data });
-  } catch (err) {
-    console.error("API error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({
+      ok: true,
+      job: data,
+    });
+  } catch (error) {
+    console.error("Together API error:", error);
+    return NextResponse.json(
+      { error: "Fehler bei der Story-Generierung." },
+      { status: 500 }
+    );
   }
 }

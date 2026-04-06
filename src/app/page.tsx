@@ -48,11 +48,19 @@ export default function Home() {
         }),
       });
 
-      const data = await response.json();
+      const rawText = await response.text();
+console.log("API raw response:", rawText);
 
-      if (!response.ok) {
-        throw new Error(data.error || "Fehler beim Erstellen des Druckjobs.");
-      }
+let data: any = {};
+try {
+  data = JSON.parse(rawText);
+} catch {
+  throw new Error(`API gab kein JSON zurück: ${rawText.slice(0, 200)}`);
+}
+
+if (!response.ok) {
+  throw new Error(data.error || "Fehler beim Erstellen des Druckjobs.");
+}
 
       const newVersion = version + 1;
       setVersion(newVersion);
