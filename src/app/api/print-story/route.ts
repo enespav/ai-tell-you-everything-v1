@@ -9,7 +9,7 @@ const together = new Together({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { sessionId, version, fragments, place, tone } = body;
+    const { sessionId, version, fragments, place } = body;
 
     if (!fragments || fragments.trim().length < 10) {
       return NextResponse.json(
@@ -42,10 +42,7 @@ Auch ein einzelnes Wort kann zu einer vollständigen Micro-Story werden.`;
 ${fragments}
 
 Ort:
-${place || "nicht angegeben"}
-
-Stimmung:
-${tone || "nüchtern"}`;
+${place || "nicht angegeben"}`;
 
     const response = await together.chat.completions.create({
       model: "Qwen/Qwen3.5-397B-A17B",
@@ -55,7 +52,7 @@ ${tone || "nüchtern"}`;
         { role: "user", content: userPrompt },
       ],
       temperature: 1,
-      max_tokens: 180,
+      max_tokens: 120,
     });
 
     const story = response.choices?.[0]?.message?.content?.trim();
@@ -75,7 +72,6 @@ ${tone || "nüchtern"}`;
           version,
           fragments,
           place,
-          tone,
           story,
           status: "queued",
         },
