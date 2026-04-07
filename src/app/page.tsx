@@ -96,7 +96,7 @@ export default function Home() {
         <section className="flex flex-col gap-5">
           <div>
             <label className="mb-2 block text-[18px] font-medium text-[var(--accent)]">
-              Deine Fragmente aus deinem Altag
+              Was bewegt Dich?
             </label>
             <textarea
               ref={textareaRef}
@@ -109,7 +109,7 @@ export default function Home() {
 
           <div>
             <label className="mb-2 block text-[18px] font-medium text-[var(--accent)]">
-              An welchem Ort spielt das?
+              Wo spielt das?
             </label>
             <input
               className="w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-[rgb(239,130,173,0.55)] focus:outline-none"
