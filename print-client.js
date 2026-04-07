@@ -41,12 +41,13 @@ async function markFailed(id) {
 function createReceiptPdf(job) {
   return new Promise((resolve, reject) => {
     const filePath = path.join(__dirname, `receipt-${job.id}.pdf`);
+    const logoPath = path.join(__dirname, "public", "logo-print.png");
 
     const doc = new PDFDocument({
-      size: [226, 800], // ca. 80mm Breite in Punkten
+      size: [226, 900], // ca. 80mm Breite
       margins: {
-        top: 20,
-        bottom: 20,
+        top: 18,
+        bottom: 24,
         left: 18,
         right: 18,
       },
@@ -55,31 +56,68 @@ function createReceiptPdf(job) {
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
 
-    doc.font("Helvetica-Bold").fontSize(12).text("AI TELL YOU EVERYTHING", {
-      align: "center",
-    });
-
-    doc.moveDown(0.3);
-    doc.font("Helvetica").fontSize(10).text("--------------------------------", {
-      align: "center",
-    });
-
-    doc.moveDown(0.8);
-
-    doc.font("Helvetica").fontSize(10).text(job.story, {
-      align: "left",
-      width: 190,
-    });
-
-    doc.moveDown(1);
-
-    if (job.place) {
-      doc.text(`Ort: ${job.place}`);
+    // HEADER: Logo
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, {
+        fit: [190, 90],
+        align: "center",
+        valign: "top",
+      });
+      doc.moveDown(1.4);
+    } else {
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("AI TELL YOU EVERYTHING", { align: "center" });
+      doc.moveDown(1);
     }
 
-    doc.text(formatDateTime(job.created_at));
-    doc.moveDown(0.8);
-    doc.text(`V${String(job.version).padStart(2, "0")} · ${job.session_id}`);
+    // Abstand vor Story
+    doc.moveDown(2.4);
+
+    // STORY
+    doc
+      .font("Helvetica")
+      .fontSize(12)
+      .text(job.story, {
+        align: "left",
+        width: 200,
+        lineGap: 2,
+      });
+
+    // Abstand vor Metadaten
+    doc.moveDown(3.4);
+
+    // METADATEN
+doc.font("Helvetica").fontSize(10);
+
+if (job.place) {
+  doc.text(`Ort: ${job.place}`, {
+    align: "left",
+  });
+}
+
+doc.text(formatDateTime(job.created_at), {
+  align: "left",
+});
+
+doc.text(`V${String(job.version).padStart(2, "0")} · ${job.session_id}`, {
+  align: "left",
+});
+
+// gewünschter Weißraum nach den Metadaten
+doc.y += 85;
+
+// fast unsichtbarer Marker weit unten rechts
+doc
+  .font("Helvetica")
+  .fontSize(10)
+  .fillColor("black")
+  .text(".", 195, doc.y, {
+    lineBreak: false,
+  });
+
+doc.moveDown(3);
 
     doc.end();
 

@@ -86,9 +86,11 @@ export default function Home() {
     <main className="min-h-screen bg-[var(--bg)] text-white px-5 py-6 md:px-8 md:py-10">
       <div className="mx-auto flex min-h-screen max-w-xl flex-col gap-6">
         <header className="flex flex-col gap-3">
-          <h1 className="max-w-[10ch] text-4xl font-black leading-[0.95] text-[var(--accent)] md:text-6xl">
-            AI tell you everything
-          </h1>
+          <img
+  src="/logo-web.svg"
+  alt="AI Tell You Everything"
+  className="w-full max-w-lg md:max-w-xl"
+/>
         </header>
 
         <section className="flex flex-col gap-5">
