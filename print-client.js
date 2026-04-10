@@ -86,7 +86,7 @@ function createReceiptPdf(job) {
       });
 
     // Abstand vor Metadaten
-    doc.moveDown(5.4);
+    doc.moveDown(3.4);
 
     // METADATEN
 doc.font("Helvetica").fontSize(10);
