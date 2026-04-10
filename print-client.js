@@ -82,11 +82,11 @@ function createReceiptPdf(job) {
       .text(job.story, {
         align: "left",
         width: 200,
-        lineGap: 2,
+        lineGap: 4,
       });
 
     // Abstand vor Metadaten
-    doc.moveDown(3.4);
+    doc.moveDown(5.4);
 
     // METADATEN
 doc.font("Helvetica").fontSize(10);
