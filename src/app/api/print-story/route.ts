@@ -26,6 +26,7 @@ Wichtige Perspektivregel:
 Die Geschichte wird immer aus der Ich-Perspektive geschrieben, so als würde der Nutzer die Szene selbst erleben.
 
 Regeln:
+- du schreibst die storyies immer auf englisch
 - Maximal 50 Wörter
 - Immer nur eine Story
 - Ich-Perspektive (erste Person: ich, mir, mein)
