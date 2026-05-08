@@ -206,17 +206,6 @@ export default function Home() {
     <main className="min-h-screen bg-[var(--bg)] px-5 py-6 text-white md:px-8 md:py-10">
       <div className="mx-auto flex min-h-screen max-w-xl flex-col gap-6">
         <header className="flex flex-col gap-3">
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setLanguage(nextLanguage)}
-              className="border border-[var(--accent)] px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-[var(--accent)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--bg)]"
-              aria-label={`Switch language to ${copy[nextLanguage].languageName}`}
-            >
-              {language.toUpperCase()}
-            </button>
-          </div>
-
           <img
             src="/logo-web.svg"
             alt="AI Tell You Everything"
@@ -275,7 +264,18 @@ export default function Home() {
             <p className="text-center text-sm text-[var(--accent)]">{status}</p>
           )}
 
-          <p className="text-[14px] leading-relaxed text-white">{t.helper}</p>
+          <div className="flex flex-col items-start gap-3">
+            <p className="text-[14px] leading-relaxed text-white">{t.helper}</p>
+
+            <button
+              type="button"
+              onClick={() => setLanguage(nextLanguage)}
+              className="self-end border border-[var(--accent)] px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-[var(--accent)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--bg)]"
+              aria-label={`Switch language to ${copy[nextLanguage].languageName}`}
+            >
+              {language.toUpperCase()}
+            </button>
+          </div>
         </section>
       </div>
     </main>
