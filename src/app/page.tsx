@@ -2,12 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 
+const fragmentPlaceholders = [
+  "Ich stand am Mainufer, als ein Fahrrad ohne Licht vorbeizog und jemand am Kiosk sagte, heute Nacht werde nichts mehr so bleiben wie gestern.",
+  "Im Hausflur roch es nach Suppe und nasser Jacke, und irgendwo über mir lachte eine Person so plötzlich, dass ich für einen Moment dachte, sie hätte auf mich gewartet.",
+  "Die Straßenbahn hielt zu lange an der Haltestelle, während draußen Papier über den Gehweg strich und zwei Fremde gleichzeitig in verschiedene Richtungen auf denselben Himmel zeigten.",
+  "Vor dem Späti summte das Neonlicht, ein Hund zog an der Leine, und ich merkte erst beim Kleingeldsuchen, dass ich den ganzen Rückweg über denselben Satz im Kopf getragen hatte.",
+  "Am Fenster gegenüber saß jemand im blauen Licht, hob kurz die Hand gegen die Scheibe, und unten auf der Straße tat der Wind so, als könnte er verlorene Dinge zurückbringen.",
+];
+
 export default function Home() {
   const [fragments, setFragments] = useState("");
   const [place, setPlace] = useState("");
   const [version, setVersion] = useState(1);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [typedPlaceholder, setTypedPlaceholder] = useState("");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -25,11 +34,39 @@ export default function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    let placeholderIndex = 0;
+    let charIndex = 0;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const tick = () => {
+      const current = fragmentPlaceholders[placeholderIndex];
+      charIndex += 1;
+      setTypedPlaceholder(current.slice(0, charIndex));
+
+      if (charIndex === current.length) {
+        placeholderIndex = (placeholderIndex + 1) % fragmentPlaceholders.length;
+        charIndex = 0;
+        timeoutId = setTimeout(() => {
+          setTypedPlaceholder("");
+          tick();
+        }, 2600);
+        return;
+      }
+
+      timeoutId = setTimeout(tick, 45);
+    };
+
+    timeoutId = setTimeout(tick, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   const handlePrint = async () => {
     if (loading) return;
 
     if (fragments.trim().length < 10) {
-      alert("Bitte schreibe mindestens zwei Fragmente.");
+      alert("Bitte schreibe mindestens zwei Inputs.");
       return;
     }
 
@@ -100,8 +137,8 @@ export default function Home() {
             </label>
             <textarea
               ref={textareaRef}
-              className="h-44 w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-[rgb(239,130,173,0.55)] focus:outline-none md:h-52"
-              placeholder={`am kiosk war noch licht\njemand telefonierte laut\nstraßenbahn kam zu früh`}
+              className="h-44 w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-[rgb(231,134,181,0.55)] focus:outline-none md:h-52"
+              placeholder={typedPlaceholder}
               value={fragments}
               onChange={(e) => setFragments(e.target.value)}
             />
@@ -112,7 +149,7 @@ export default function Home() {
               Wo spielt das?
             </label>
             <input
-              className="w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-[rgb(239,130,173,0.55)] focus:outline-none"
+              className="w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-[rgb(231,134,181,0.55)] focus:outline-none"
               placeholder="z. B. Gallus, Mainufer, Kiosk"
               value={place}
               onChange={(e) => setPlace(e.target.value)}
@@ -123,7 +160,7 @@ export default function Home() {
             type="button"
             onClick={handlePrint}
             disabled={loading}
-            className="w-full bg-[var(--accent)] py-4 text-lg font-semibold text-[var(--bg)] transition-opacity disabled:cursor-not-allowed disabled:opacity-50 md:py-5 md:text-xl"
+            className="w-full bg-[var(--accent)] py-4 text-lg font-semibold text-[var(--bg)] transition-transform transition-opacity duration-150 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 md:py-5 md:text-xl"
           >
             {loading ? "Bitte warten…" : "Story drucken"}
           </button>
@@ -134,8 +171,8 @@ export default function Home() {
             </p>
           )}
 
-          <p className="text-xs leading-relaxed text-white/65">
-            Deine Fragmente bleiben erhalten. Du kannst sie verändern und erneut
+          <p className="text-[14px] leading-relaxed text-white">
+            Deine Inputs bleiben erhalten. Du kannst sie verändern und erneut
             drucken.
           </p>
         </section>

@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
     if (!fragments || fragments.trim().length < 10) {
       return NextResponse.json(
-        { error: "Bitte schreibe mindestens zwei Fragmente." },
+        { error: "Bitte schreibe mindestens zwei Inputs." },
         { status: 400 }
       );
     }
@@ -41,7 +41,7 @@ Regeln:
 Der Input soll kreativ verarbeitet werden und als Ausgangspunkt für die Szene dienen.
 Auch ein einzelnes Wort kann zu einer vollständigen Micro-Story werden.`;
 
-    const userPrompt = `Fragmente:
+    const userPrompt = `Input:
 ${fragments}
 
 Ort:
