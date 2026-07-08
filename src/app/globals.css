@@ -24,3 +24,17 @@ body {
   background: var(--bg);
   color: var(--text);
 }
+
+::selection,
+input::selection,
+textarea::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+::-moz-selection,
+input::-moz-selection,
+textarea::-moz-selection {
+  background: var(--accent);
+  color: var(--bg);
+}

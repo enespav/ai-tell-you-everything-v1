@@ -109,7 +109,7 @@ export async function POST(request: Request) {
     }
 
     const response = await together.chat.completions.create({
-      model: "Qwen/Qwen3.5-397B-A17B",
+      model: "MiniMaxAI/MiniMax-M3",
       reasoning: { enabled: false },
       messages: [
         { role: "system", content: t.systemPrompt },

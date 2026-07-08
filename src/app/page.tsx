@@ -7,11 +7,22 @@ type Language = "de" | "en";
 const copy = {
   de: {
     placeholders: [
-      "Ich stand am Mainufer, als ein Fahrrad ohne Licht vorbeizog und jemand am Kiosk sagte, heute Nacht werde nichts mehr so bleiben wie gestern.",
-      "Im Hausflur roch es nach Suppe und nasser Jacke, und irgendwo über mir lachte eine Person so plötzlich, dass ich für einen Moment dachte, sie hätte auf mich gewartet.",
-      "Die Straßenbahn hielt zu lange an der Haltestelle, während draußen Papier über den Gehweg strich und zwei Fremde gleichzeitig in verschiedene Richtungen auf denselben Himmel zeigten.",
-      "Vor dem Späti summte das Neonlicht, ein Hund zog an der Leine, und ich merkte erst beim Kleingeldsuchen, dass ich den ganzen Rückweg über denselben Satz im Kopf getragen hatte.",
-      "Am Fenster gegenüber saß jemand im blauen Licht, hob kurz die Hand gegen die Scheibe, und unten auf der Straße tat der Wind so, als könnte er verlorene Dinge zurückbringen.",
+      "Heute Morgen am Main lag Nebel über dem Wasser, und als die Sonne langsam durchkam, erzählte jemand neben mir, dass die Bäume dieses Jahr viel zu früh blühen würden.",
+      "Ich blieb kurz vor einer alten Hauswand stehen, weil jemand sagte, hier habe früher einmal die Grenze zwischen zwei ganz unterschiedlichen Städten begonnen.",
+      "Vor dem Kiosk diskutierten zwei Menschen über die letzte Wahl, während hinter ihnen neue Wahlplakate im Wind gegen die Laterne schlugen.",
+      "Im Park versuchte ein Junge minutenlang denselben Trick mit dem Fußball, und jedes Mal applaudierte jemand auf der Bank ein kleines bisschen lauter.",
+      "Als ich im Supermarkt bezahlen wollte, sprach die Kassiererin mit der Person vor mir über steigende Preise und darüber, dass früher alles länger gehalten habe.",
+      "Die Straßenbahn hielt heute ungewöhnlich lange an der Haltestelle, während draußen Fahrräder zwischen Lieferwagen und regennassen Schienen vorbeizogen.",
+      "Im Zug leuchteten fast alle Gesichter im blauen Licht ihrer Smartphones, und für einen Moment wirkte es, als würde niemand mehr aus dem Fenster schauen.",
+      "Vor dem Museum standen Menschen mit Programmen und halb geleerten Kaffeebechern, während aus einem offenen Fenster leise Musik auf die Straße fiel.",
+      "Heute Nachmittag sammelte sich Regenwasser zwischen den Pflastersteinen am Mainufer, und Möwen liefen hindurch, als gehöre ihnen die ganze Stadt.",
+      "Im Treppenhaus erzählte mir jemand, dass dieses Gebäude früher einmal eine Druckerei gewesen sei, und seitdem achte ich auf jedes Geräusch der alten Rohre.",
+      "An der Haltestelle stritten zwei Fremde über neue Gesetze, während hinter ihnen jemand schweigend kostenlose Zeitungen verteilte.",
+      "Ich lief am Bolzplatz vorbei, als plötzlich alle gleichzeitig zum Himmel sahen, weil der Ball viel zu hoch über den Zaun geflogen war.",
+      "Heute im Café sprach die Person am Nebentisch gleichzeitig über Mietpreise, Überstunden und die Hoffnung, nächsten Monat endlich verreisen zu können.",
+      "Als ich an der roten Ampel wartete, zog ein Motorrad zwischen den Autos hindurch und jemand murmelte, die Stadt werde jedes Jahr lauter.",
+      "Im Bus fiel plötzlich das WLAN aus, und für einen kurzen Moment schauten alle gleichzeitig auf, als hätten sie denselben Gedanken verloren.",
+      "Neben dem Theater lagen noch zerknitterte Programmhefte auf dem Boden, während jemand im Vorbeigehen eine Szene aus dem Stück zitierte.",
     ],
     languageName: "Deutsch",
     fragmentsLabel: "Was bewegt Dich?",
@@ -31,11 +42,22 @@ const copy = {
   },
   en: {
     placeholders: [
-      "I was standing by the river when a bicycle without lights rolled past and someone at the kiosk said tonight would not end the way the day had begun.",
-      "The hallway smelled of soup and wet coats, and somewhere above me a person laughed so suddenly that for a moment I thought they had been waiting for me.",
-      "The tram stayed too long at the stop while paper dragged across the pavement outside and two strangers pointed at the same sky in different directions.",
-      "Outside the corner shop the neon hummed, a dog pulled at its leash, and I only noticed while counting coins that I had carried the same sentence all the way home.",
-      "In the window across the street someone sat in blue light, lifted a hand against the glass, and below on the road the wind behaved as if it could return lost things.",
+      "This morning the river was covered in fog, and as the sun slowly came through, someone beside me said the trees would bloom far too early this year.",
+      "I stopped for a moment in front of an old wall because someone told me this used to be where the border between two completely different cities began.",
+      "In front of the kiosk, two people were discussing the last election while new campaign posters kept hitting the streetlight behind them in the wind.",
+      "In the park, a boy kept trying the same football trick over and over again, and each time someone on the bench applauded a little louder.",
+      "At the supermarket checkout, the cashier was talking to the person in front of me about rising prices and how things used to last much longer.",
+      "The tram stopped unusually long at the station today while bicycles moved between delivery vans and rain-soaked tracks outside.",
+      "On the train, almost every face glowed in the blue light of a smartphone, and for a moment it felt as if nobody was looking out the window anymore.",
+      "Outside the museum, people stood holding programs and half-empty coffee cups while quiet music drifted onto the street from an open window.",
+      "This afternoon rainwater gathered between the stones along the riverbank, and seagulls walked through it as if the whole city belonged to them.",
+      "Someone in the stairwell told me this building used to be a printing house, and ever since then I notice every sound the old pipes make.",
+      "At the tram stop, two strangers argued about new laws while someone behind them silently handed out free newspapers.",
+      "I walked past the football court just as everyone suddenly looked up at the same time because the ball had flown far too high over the fence.",
+      "Today at the café, the person at the next table spoke at the same time about rent prices, overtime, and the hope of finally traveling next month.",
+      "While I waited at the red light, a motorcycle slipped between the cars and someone nearby murmured that the city gets louder every year.",
+      "The Wi-Fi suddenly stopped working on the bus, and for a brief moment everyone looked up as if they had all lost the same thought.",
+      "Crumpled theater programs were still lying on the ground beside the venue while someone walking past quietly quoted a scene from the play.",
     ],
     languageName: "English",
     fragmentsLabel: "What's on your mind?",
@@ -220,7 +242,7 @@ export default function Home() {
             </label>
             <textarea
               ref={textareaRef}
-              className="h-44 w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-[rgb(231,134,181,0.55)] focus:outline-none md:h-52"
+              className="h-44 w-full rounded-none border border-[rgb(231,134,181,0.62)] bg-transparent p-3 text-white transition-[border-color,box-shadow] duration-150 placeholder:text-[rgb(231,134,181,0.55)] hover:border-[var(--accent)] hover:shadow-[0_0_0_2px_rgba(231,134,181,0.14)] focus:border-[var(--accent)] focus:shadow-none focus:outline-none md:h-52"
               placeholder={typedPlaceholder}
               value={fragments}
               onChange={(e) => setFragments(e.target.value)}
@@ -232,7 +254,7 @@ export default function Home() {
               {t.placeLabel}
             </label>
             <input
-              className="w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-[rgb(231,134,181,0.55)] focus:outline-none"
+              className="w-full rounded-none border border-[rgb(231,134,181,0.62)] bg-transparent p-3 text-white transition-[border-color,box-shadow] duration-150 placeholder:text-[rgb(231,134,181,0.55)] hover:border-[var(--accent)] hover:shadow-[0_0_0_2px_rgba(231,134,181,0.14)] focus:border-[var(--accent)] focus:shadow-none focus:outline-none"
               placeholder={t.placePlaceholder}
               value={place}
               onChange={(e) => setPlace(e.target.value)}
@@ -244,7 +266,7 @@ export default function Home() {
               {t.speakerLabel}
             </label>
             <input
-              className="w-full rounded-none border border-[var(--accent)] bg-transparent p-3 text-white placeholder:text-[rgb(231,134,181,0.55)] focus:outline-none"
+              className="w-full rounded-none border border-[rgb(231,134,181,0.62)] bg-transparent p-3 text-white transition-[border-color,box-shadow] duration-150 placeholder:text-[rgb(231,134,181,0.55)] hover:border-[var(--accent)] hover:shadow-[0_0_0_2px_rgba(231,134,181,0.14)] focus:border-[var(--accent)] focus:shadow-none focus:outline-none"
               placeholder={t.speakerPlaceholder}
               value={speaker}
               onChange={(e) => setSpeaker(e.target.value)}

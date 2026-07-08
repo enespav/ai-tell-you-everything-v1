@@ -4,7 +4,7 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const { print } = require("pdf-to-printer");
 
-const APP_BASE_URL = "https://ai-tell-you-everything-v1.vercel.app";
+const APP_BASE_URL = "https://ai-tell-you-everything.de";
 const PRINTER_NAME = "EPSON TM-T88V Receipt5";
 const SESSION_PREFIX_SEPARATOR = "::";
 const RECEIPT_ARCHIVE_DIR = path.join(__dirname, "receipt-archive");
