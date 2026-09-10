@@ -113,7 +113,7 @@ export async function POST(request: Request) {
     try {
       response = await together.chat.completions.create({
         model: "MiniMaxAI/MiniMax-M3",
-        reasoning: { enabled: false },
+        chat_template_kwargs: { thinking_mode: "disabled" },
         messages: [
           { role: "system", content: t.systemPrompt },
           {
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
       story,
     });
 
-    if (!story) {
+    if (finishReason === "length" || !story) {
       return NextResponse.json({ error: t.noStory }, { status: 500 });
     }
 
