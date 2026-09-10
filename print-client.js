@@ -84,7 +84,23 @@ function sleep(ms) {
 
 async function fetchNextJob() {
   const response = await fetch(`${APP_BASE_URL}/api/print-jobs/next`);
-  const data = await response.json();
+  const rawText = await response.text();
+  let data;
+
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    throw new Error(
+      `GET /api/print-jobs/next returned invalid JSON (${response.status} ${response.statusText}): ${rawText.slice(0, 500)}`
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `GET /api/print-jobs/next failed (${response.status} ${response.statusText}): ${data.error || rawText}`
+    );
+  }
+
   return data.job;
 }
 
@@ -110,6 +126,7 @@ function createReceiptPdf(job) {
     const logoPath = path.join(__dirname, "public", "logo-print.png");
     const sessionData = parseSessionValue(job.session_id, job.story);
     const labels = labelsForLanguage(sessionData.language);
+    let pageCount = 1;
 
     const doc = new PDFDocument({
       size: [226, 900],
@@ -125,6 +142,9 @@ function createReceiptPdf(job) {
 
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
+    doc.on("pageAdded", () => {
+      pageCount += 1;
+    });
 
     if (fs.existsSync(logoPath)) {
       doc.image(logoPath, {
@@ -199,7 +219,10 @@ function createReceiptPdf(job) {
     doc.moveDown(3);
     doc.end();
 
-    stream.on("finish", () => resolve(filePath));
+    stream.on("finish", () => {
+      console.log(`PDF fuer Job ${job.id}: ${pageCount} Seite(n)`);
+      resolve(filePath);
+    });
     stream.on("error", reject);
   });
 }
@@ -227,6 +250,11 @@ async function run() {
       }
 
       console.log(`Drucke Job ${job.id} ...`);
+      console.log("Empfangene Story:", {
+        id: job.id,
+        storyLength: typeof job.story === "string" ? job.story.length : 0,
+        story: job.story,
+      });
 
       try {
         const pdfPath = await printJob(job);
@@ -238,10 +266,13 @@ async function run() {
         await markFailed(job.id);
       }
     } catch (error) {
-      console.error("Polling-Fehler:", error);
+      console.error("Print-client polling error:", error);
       await sleep(3000);
     }
   }
 }
 
-run();
+run().catch((error) => {
+  console.error("Print-Client unerwartet beendet:", error);
+  process.exitCode = 1;
+});

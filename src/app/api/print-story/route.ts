@@ -37,7 +37,7 @@ Sprachregel:
 - Der fertige Text muss vollständig auf Deutsch sein, auch wenn der Input Englisch oder gemischt ist.
 
 Regeln:
-- Maximal 40 Wörter
+- Maximal 50 Wörter
 - Immer nur eine Story
 - Ich-Perspektive (erste Person: ich, mir, mein)
 - Keine Überschrift
@@ -70,7 +70,7 @@ Language rule:
 - The final text must be fully in English, even if the input is German or mixed.
 
 Rules:
-- Maximum 40 words
+- Maximum 50 words
 - Only one story
 - First person perspective (I, me, my)
 - No title
@@ -108,52 +108,77 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: t.tooShort }, { status: 400 });
     }
 
-    const response = await together.chat.completions.create({
-      model: "MiniMaxAI/MiniMax-M3",
-      reasoning: { enabled: false },
-      messages: [
-        { role: "system", content: t.systemPrompt },
-        {
-          role: "user",
-          content: `${t.userPromptPrefix}\n${fragments}`,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 120,
-    });
+    let response;
+
+    try {
+      response = await together.chat.completions.create({
+        model: "MiniMaxAI/MiniMax-M3",
+        reasoning: { enabled: false },
+        messages: [
+          { role: "system", content: t.systemPrompt },
+          {
+            role: "user",
+            content: `${t.userPromptPrefix}\n${fragments}`,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 250,
+      });
+    } catch (error) {
+      console.error("Together API request error:", error);
+      return NextResponse.json({ error: t.generationError }, { status: 500 });
+    }
 
     const story = response.choices?.[0]?.message?.content?.trim();
+    const finishReason = response.choices?.[0]?.finish_reason;
+
+    console.log("Together completion result:", {
+      finishReason,
+      storyLength: story?.length ?? 0,
+      story,
+    });
 
     if (!story) {
       return NextResponse.json({ error: t.noStory }, { status: 500 });
     }
 
-    const { data, error } = await supabaseServer
-      .from("print_jobs")
-      .insert([
-        {
-          session_id: encodeSpeakerValue(language, speaker),
-          version,
-          fragments,
-          place,
-          story,
-          status: "queued",
-        },
-      ])
-      .select()
-      .single();
+    let data;
 
-    if (error) {
-      console.error("Supabase insert error:", error);
+    try {
+      const insertResult = await supabaseServer
+        .from("print_jobs")
+        .insert([
+          {
+            session_id: encodeSpeakerValue(language, speaker),
+            version,
+            fragments,
+            place,
+            story,
+            status: "queued",
+          },
+        ])
+        .select()
+        .single();
+
+      if (insertResult.error) {
+        console.error("Supabase print_jobs insert error:", insertResult.error);
+        return NextResponse.json({ error: t.saveError }, { status: 500 });
+      }
+
+      data = insertResult.data;
+    } catch (error) {
+      console.error("Supabase print_jobs insert exception:", error);
       return NextResponse.json({ error: t.saveError }, { status: 500 });
     }
+
+    console.log("Print job queued:", { id: data.id, status: data.status });
 
     return NextResponse.json({
       ok: true,
       job: data,
     });
   } catch (error) {
-    console.error("Together API error:", error);
+    console.error("Print story route error:", error);
     return NextResponse.json(
       { error: copy[language].generationError },
       { status: 500 }

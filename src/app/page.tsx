@@ -194,7 +194,11 @@ export default function Home() {
       });
 
       const rawText = await response.text();
-      console.log("API raw response:", rawText);
+      console.log("/api/print-story response:", {
+        status: response.status,
+        statusText: response.statusText,
+        body: rawText,
+      });
 
       let data: { error?: string } = {};
       try {
@@ -204,6 +208,11 @@ export default function Home() {
       }
 
       if (!response.ok) {
+        console.error("/api/print-story error:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: data.error || t.printError,
+        });
         throw new Error(data.error || t.printError);
       }
 
@@ -217,7 +226,7 @@ export default function Home() {
       setStatus(`${t.printedStatus} ${String(version).padStart(2, "0")}`);
       textareaRef.current?.focus();
     } catch (error) {
-      console.error(error);
+      console.error("Print request failed:", error);
       setStatus(t.printError);
     } finally {
       setLoading(false);

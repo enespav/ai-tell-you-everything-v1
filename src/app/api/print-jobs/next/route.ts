@@ -20,6 +20,7 @@ export async function GET() {
     }
 
     const job = jobs[0];
+    console.log("Next queued print job found:", { id: job.id });
 
     const { data: updatedJob, error: updateError } = await supabaseServer
       .from("print_jobs")
@@ -33,10 +34,17 @@ export async function GET() {
       .single();
 
     if (updateError) {
-      console.error("Update error:", updateError);
+      console.error("Print job claim update error:", {
+        id: job.id,
+        error: updateError,
+      });
       return NextResponse.json({ error: "Update failed" }, { status: 500 });
     }
 
+    console.log("Print job claimed:", {
+      id: updatedJob.id,
+      status: updatedJob.status,
+    });
     return NextResponse.json({ job: updatedJob });
   } catch (error) {
     console.error("GET next job error:", error);
